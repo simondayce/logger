@@ -1,4 +1,4 @@
-module github.com/SimondayCE/logger
+module github.com/simondayce/logger
 
 go 1.20
 
