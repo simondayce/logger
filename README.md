@@ -10,7 +10,7 @@ Before using the logger, you should have Go installed.
 To install the logger, run the following command:
 
 ```shell
-go get github.com/SimondayCE/logger
+go get github.com/simondayce/logger
 ```
 
 ### Environment variable
