@@ -41,26 +41,22 @@ logger := logger.NewLogger(e, log, os.Getenv("serviceName"), os.Getenv("graylogE
 - `serviceName`: a string containing the name of your service.
 - `graylogEndpoint`: a string containing the endpoint of your Graylog server.
 
-Add the middleware to your Echo application using `logger.Middleware()`
-```go
-e.Use(logger.Middleware())
-```
-
-You can now use `logger.Log` function to log messages:
+You can now use `logger.Log` function to log messages, like default logrus logger:
 ```go
 e.GET("/", func(c echo.Context) error {
-    logger.Log(c, "Hello info from logger", "info")
+    log := logger.Log(c)
+	log.Info("Log message here!")
     return c.String(http.StatusOK, "Hello, World!")
 })
 ```
 
-`logger.Log` function takes three parameters:
+`logger.Log` function takes one parameter:
 
 - `c`: an instance of `echo.Context` struct.
-- `msg`: a string containing the log message.
-- `level`: a string containing the log level (e.g. "info", "warn", "error").
 
-You can use this logger module in the delivery layer, so you can pass `echo.Context` to `logger.Log`. Make sure to also pass `logger.Log` to the next layer, such as the use case and repository layers.
+And `logger.Log` will return `*logrus.Entry`
+
+You can use this logger module in the delivery layer, so you can pass `echo.Context` to `logger.Log` for get uri, remote ip & etc. Make sure to also pass `logger.Log` to the next layer, such as the use case and repository layers.
 
 ## Built With
 - [Echo](https://github.com/labstack/echo) - A fast and unfancy micro web framework for Go.
