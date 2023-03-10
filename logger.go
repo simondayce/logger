@@ -47,7 +47,7 @@ func NewLogger(e *echo.Echo, log *logrus.Logger, serviceName string, graylogEndp
 		LogURIPath:   true,
 		LogValuesFunc: func(c echo.Context, values middleware.RequestLoggerValues) error {
 			// Log the HTTP request information in JSON format.
-			logrus.WithFields(logrus.Fields{
+			log.WithFields(logrus.Fields{
 				"uri":        values.URI,
 				"status":     values.Status,
 				"remote_ip":  values.RemoteIP,
