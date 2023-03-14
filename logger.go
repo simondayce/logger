@@ -12,6 +12,7 @@ import (
 type Logger interface {
 	Log(c echo.Context) *logrus.Entry
 	DefaultLog() *logrus.Logger
+	Print(v ...interface{})
 }
 
 // LogImplementation struct implements the Logger interface.
@@ -85,4 +86,23 @@ func (logger *LogImplementation) Log(c echo.Context) *logrus.Entry {
 // DefaultLog is method of LogImplementation struct with no additional field, DefaultLog just have graylog hook.
 func (logger *LogImplementation) DefaultLog() *logrus.Logger {
 	return logger.Logrus
+}
+
+// Print is method for gorm logger
+func (logger *LogImplementation) Print(v ...interface{}) {
+	switch v[0] {
+	case "sql":
+		logger.Logrus.WithFields(
+			logrus.Fields{
+				"module":        "gorm",
+				"type":          "sql",
+				"rows_returned": v[5],
+				"src":           v[1],
+				"values":        v[4],
+				"duration":      v[2],
+			},
+		).Info(v[3])
+	case "log":
+		logger.Logrus.WithFields(logrus.Fields{"module": "gorm", "type": "log"}).Print(v[2])
+	}
 }
