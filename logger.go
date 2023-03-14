@@ -11,6 +11,7 @@ import (
 // Logger interface defines the Log method for logging messages.
 type Logger interface {
 	Log(c echo.Context) *logrus.Entry
+	DefaultLog() *logrus.Logger
 }
 
 // LogImplementation struct implements the Logger interface.
@@ -66,7 +67,7 @@ func NewLogger(e *echo.Echo, log *logrus.Logger, serviceName string, graylogEndp
 	return &LogImplementation{Echo: e, Logrus: log}
 }
 
-// Log is a method of LogImplementation struct that logs the message at the given level.
+// Log is a method of LogImplementation struct that logs the message at the given level and set some field from echo, like uri, remote ip & etc.
 func (logger *LogImplementation) Log(c echo.Context) *logrus.Entry {
 	// Create a log entry with fields for the HTTP request information.
 	return logger.Logrus.WithFields(logrus.Fields{
@@ -77,5 +78,11 @@ func (logger *LogImplementation) Log(c echo.Context) *logrus.Entry {
 		"error":      c.Error,
 		"user_agent": c.Request().UserAgent(),
 		"uri_path":   c.Path(),
+		"user":       c.Request().Context().Value("email"),
 	})
+}
+
+// DefaultLog is method of LogImplementation struct with no additional field, DefaultLog just have graylog hook.
+func (logger *LogImplementation) DefaultLog() *logrus.Logger {
+	return logger.Logrus
 }

@@ -24,7 +24,7 @@ Example:
 To use this package, import it in your Go code:
 
 ```go
-import "github.com/SimondayCE/logger"
+import "github.com/simondayce/logger"
 ```
 
 Then, create a new logger using `NewLogger` function:
