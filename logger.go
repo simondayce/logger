@@ -8,6 +8,9 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+type ServiceName string
+type GraylogEndpoint string
+
 // Logger interface defines the Log method for logging messages.
 type Logger interface {
 	Log(c echo.Context) *logrus.Entry
@@ -23,7 +26,7 @@ type LogImplementation struct {
 }
 
 // NewLogger creates a new instance of Logger with Echo, Logrus, service name, and Graylog endpoint.
-func NewLogger(e *echo.Echo, log *logrus.Logger, serviceName string, graylogEndpoint string) Logger {
+func NewLogger(e *echo.Echo, log *logrus.Logger, serviceName ServiceName, graylogEndpoint GraylogEndpoint) Logger {
 	// Set log formatter to JSON
 	log.SetFormatter(&logrus.JSONFormatter{})
 
@@ -31,7 +34,7 @@ func NewLogger(e *echo.Echo, log *logrus.Logger, serviceName string, graylogEndp
 	log.SetReportCaller(true)
 
 	// Add a hook to send logs to Graylog.
-	hook := graylog.NewGraylogHook(graylogEndpoint, map[string]interface{}{"service": serviceName})
+	hook := graylog.NewGraylogHook(string(graylogEndpoint), map[string]interface{}{"service": serviceName})
 	log.AddHook(hook)
 
 	// Middleware for logging all request inside Echo
