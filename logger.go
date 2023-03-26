@@ -73,6 +73,7 @@ func NewLogger(e *echo.Echo, log *logrus.Logger, serviceName ServiceName, graylo
 // Log is a method of LogImplementation struct that logs the message at the given level and set some field from echo, like uri, remote ip & etc.
 func (logger *LogImplementation) Log(c echo.Context) *logrus.Entry {
 	// Create a log entry with fields for the HTTP request information.
+	email := c.Get("user").(string)
 	return logger.Logrus.WithFields(logrus.Fields{
 		"uri":        c.Request().RequestURI,
 		"remote_ip":  c.RealIP(),
@@ -81,7 +82,7 @@ func (logger *LogImplementation) Log(c echo.Context) *logrus.Entry {
 		"error":      c.Error,
 		"user_agent": c.Request().UserAgent(),
 		"uri_path":   c.Path(),
-		"user":       c.Request().Context().Value("email"),
+		"user":       email,
 	})
 }
 
