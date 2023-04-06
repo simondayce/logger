@@ -42,9 +42,7 @@ func (logger *LogImplementation) Log(c echo.Context) *logrus.Entry {
 	// Create a log entry with fields for the HTTP request information.
 	var email string
 	session := c.Get("email")
-	if session != nil {
-		email = session.(string)
-	}
+	email, _ = session.(string)
 	return logger.Logrus.WithFields(logrus.Fields{
 		"uri":        c.Request().RequestURI,
 		"remote_ip":  c.RealIP(),
