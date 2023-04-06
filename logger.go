@@ -3,6 +3,7 @@ package logger
 
 import (
 	graylog "github.com/gemnasium/logrus-graylog-hook/v3"
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/sirupsen/logrus"
@@ -11,10 +12,21 @@ import (
 type ServiceName string
 type GraylogEndpoint string
 
+// GetLogID generate and return UUID.
+func GetLogID() string {
+	// Generate UUID
+	uuid, err := uuid.NewRandom()
+	if err != nil {
+		return "failed to generate UUID"
+	}
+
+	return uuid.String()
+}
+
 // Logger interface defines the Log method for logging messages.
 type Logger interface {
 	Log(c echo.Context) *logrus.Entry
-	DefaultLog() *logrus.Logger
+	DefaultLog() *logrus.Entry
 }
 
 // LogImplementation struct implements the Logger interface.
@@ -23,6 +35,30 @@ type LogImplementation struct {
 	Logrus          *logrus.Logger
 	ServiceName     string
 	GraylogEndpoint string
+}
+
+// Log is a method of LogImplementation struct that logs the message at the given level and set some field from echo, like uri, remote ip & etc.
+func (logger *LogImplementation) Log(c echo.Context) *logrus.Entry {
+	// Create a log entry with fields for the HTTP request information.
+	email := c.Get("user").(string)
+	return logger.Logrus.WithFields(logrus.Fields{
+		"uri":        c.Request().RequestURI,
+		"remote_ip":  c.RealIP(),
+		"host":       c.Request().Host,
+		"method":     c.Request().Method,
+		"error":      c.Error,
+		"user_agent": c.Request().UserAgent(),
+		"uri_path":   c.Path(),
+		"user":       email,
+		"log_id":     GetLogID(),
+	})
+}
+
+// DefaultLog is method of LogImplementation struct with no additional field, DefaultLog just have graylog hook.
+func (logger *LogImplementation) DefaultLog() *logrus.Entry {
+	return logger.Logrus.WithFields(logrus.Fields{
+		"log_id": GetLogID(),
+	})
 }
 
 // NewLogger creates a new instance of Logger with Echo, Logrus, service name, and Graylog endpoint.
@@ -68,25 +104,4 @@ func NewLogger(e *echo.Echo, log *logrus.Logger, serviceName ServiceName, graylo
 
 	// Return a new LogImplementation object.
 	return &LogImplementation{Echo: e, Logrus: log}
-}
-
-// Log is a method of LogImplementation struct that logs the message at the given level and set some field from echo, like uri, remote ip & etc.
-func (logger *LogImplementation) Log(c echo.Context) *logrus.Entry {
-	// Create a log entry with fields for the HTTP request information.
-	email := c.Get("user").(string)
-	return logger.Logrus.WithFields(logrus.Fields{
-		"uri":        c.Request().RequestURI,
-		"remote_ip":  c.RealIP(),
-		"host":       c.Request().Host,
-		"method":     c.Request().Method,
-		"error":      c.Error,
-		"user_agent": c.Request().UserAgent(),
-		"uri_path":   c.Path(),
-		"user":       email,
-	})
-}
-
-// DefaultLog is method of LogImplementation struct with no additional field, DefaultLog just have graylog hook.
-func (logger *LogImplementation) DefaultLog() *logrus.Logger {
-	return logger.Logrus
 }
