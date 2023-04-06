@@ -61,9 +61,9 @@ type LogImplementation struct {
 func (logger *LogImplementation) Log(c echo.Context) *logrus.Entry {
 	// Create a log entry with fields for the HTTP request information.
 	var email string
-	session := c.Get("session").(*Session)
+	session := c.Get("session")
 	if session != nil {
-		email = session.Val.Email
+		email = session.(*Session).Val.Email
 	}
 	return logger.Logrus.WithFields(logrus.Fields{
 		"uri":        c.Request().RequestURI,
