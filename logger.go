@@ -4,6 +4,7 @@ package logger
 import (
 	graylog "github.com/gemnasium/logrus-graylog-hook/v3"
 	"github.com/google/uuid"
+	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/sirupsen/logrus"
 )
