@@ -60,7 +60,11 @@ type LogImplementation struct {
 // Log is a method of LogImplementation struct that logs the message at the given level and set some field from echo, like uri, remote ip & etc.
 func (logger *LogImplementation) Log(c echo.Context) *logrus.Entry {
 	// Create a log entry with fields for the HTTP request information.
-	email := c.Get("session").(*Session).Val.Email
+	var email string
+	session := c.Get("session").(*Session)
+	if session != nil {
+		email = session.Val.Email
+	}
 	return logger.Logrus.WithFields(logrus.Fields{
 		"uri":        c.Request().RequestURI,
 		"remote_ip":  c.RealIP(),
