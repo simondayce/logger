@@ -7,7 +7,27 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/sirupsen/logrus"
+	"time"
 )
+
+// User adalah struktur data untuk merepresentasikan pengguna
+type User struct {
+	Id               int        `json:"id,omitempty"`
+	Name             string     `json:"name,omitempty"`
+	Email            string     `json:"email,omitempty"`
+	Title            string     `json:"title,omitempty"`
+	PhoneNumber      string     `json:"phone_number,omitempty"`
+	TelegramUsername string     `json:"telegram_username,omitempty"`
+	RoleId           int        `json:"role_id,omitempty"`
+	UpdatedAt        *time.Time `json:"updated_at"`
+	CreatedAt        *time.Time `json:"created_at"`
+}
+
+// Session adalah struct yang merepresentasikan data user yang akan di simpan dalam session(redis), session akan menyimpan key yang berupa id session dan val yang berupa data user
+type Session struct {
+	Key string
+	Val *User
+}
 
 type ServiceName string
 type GraylogEndpoint string
@@ -40,7 +60,7 @@ type LogImplementation struct {
 // Log is a method of LogImplementation struct that logs the message at the given level and set some field from echo, like uri, remote ip & etc.
 func (logger *LogImplementation) Log(c echo.Context) *logrus.Entry {
 	// Create a log entry with fields for the HTTP request information.
-	email := c.Get("user").(string)
+	email := c.Get("session").(*Session).Val.Email
 	return logger.Logrus.WithFields(logrus.Fields{
 		"uri":        c.Request().RequestURI,
 		"remote_ip":  c.RealIP(),
