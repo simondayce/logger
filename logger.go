@@ -89,6 +89,8 @@ func NewLogger(e *echo.Echo, log *logrus.Logger, serviceName ServiceName, graylo
 		LogURIPath:   true,
 		LogValuesFunc: func(c echo.Context, values middleware.RequestLoggerValues) error {
 			// Log the HTTP request information in JSON format.
+			email, _ := c.Get("email").(string)
+			logId, _ := c.Get("log_id").(string)
 			log.WithFields(logrus.Fields{
 				"uri":        values.URI,
 				"status":     values.Status,
@@ -98,6 +100,8 @@ func NewLogger(e *echo.Echo, log *logrus.Logger, serviceName ServiceName, graylo
 				"error":      values.Error,
 				"user_agent": values.UserAgent,
 				"uri_path":   values.URIPath,
+				"user":       email,
+				"log_id":     logId,
 			}).Info("echo request")
 
 			return nil
